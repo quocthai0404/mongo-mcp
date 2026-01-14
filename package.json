@@ -1,0 +1,56 @@
+{
+  "name": "mongo-mcp",
+  "version": "1.0.0",
+  "description": "MongoDB MCP Server for AI coding assistants - provides database schema, field types, sample data, and query validation",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "mongo-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsc --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "mongodb",
+    "schema",
+    "ai",
+    "copilot",
+    "claude",
+    "github-copilot",
+    "gemini"
+  ],
+  "author": "Thai Phan",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/quocthai0404/mongo-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/quocthai0404/mongo-mcp/issues"
+  },
+  "homepage": "https://github.com/quocthai0404/mongo-mcp#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "mongodb": "^6.0.0",
+    "zod": "^3.22.0",
+    "bson": "^6.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0",
+    "mongodb-memory-server": "^9.0.0",
+    "@vitest/coverage-v8": "^1.0.0"
+  }
+}
