@@ -1,0 +1,28 @@
+{
+    "name": "MongoDB MCP Server",
+    "description": "Complete MongoDB MCP Server with 27 tools for AI assistants. Features CRUD operations, aggregation, index management, and security controls.",
+    "version": "1.0.0",
+    "homepage": "https://github.com/quocthai0404/mongo-mcp",
+    "repository": "https://github.com/quocthai0404/mongo-mcp",
+    "author": {
+        "name": "Thai Phan",
+        "url": "https://github.com/quocthai0404"
+    },
+    "license": "MIT",
+    "keywords": [
+        "mongodb",
+        "mcp",
+        "database",
+        "ai",
+        "tools"
+    ],
+    "capabilities": {
+        "tools": 27,
+        "resources": 1
+    },
+    "transport": {
+        "type": "stdio"
+    },
+    "npm": "@quocthai0404/mongo-mcp",
+    "docker": "ghcr.io/quocthai0404/mongo-mcp"
+}
