@@ -3,12 +3,9 @@ import { Db } from 'mongodb';
 import { QueryValidationResult } from '../types/schema.js';
 import { validateQuery as validateQueryService } from '../services/query-validator.js';
 import { listUserCollections } from '../services/schema-inference.js';
-
 export const VALIDATE_QUERY_TOOL_NAME = 'validate_query';
-
 export const VALIDATE_QUERY_TOOL_DESCRIPTION =
   'Validates MongoDB query syntax without executing it. Checks JSON validity, operator syntax, and optionally verifies collection existence. Use this before suggesting queries to users.';
-
 export const validateQueryInputSchema = z.object({
   query: z
     .string()
@@ -19,27 +16,21 @@ export const validateQueryInputSchema = z.object({
     .optional()
     .describe('Optional collection name to verify existence'),
 });
-
 export type ValidateQueryInput = z.infer<typeof validateQueryInputSchema>;
-
 export interface ValidateQueryOutput extends QueryValidationResult {
   parsedQuery?: object;
 }
-
 export async function executeValidateQuery(
   db: Db,
   input: ValidateQueryInput
 ): Promise<ValidateQueryOutput> {
   const { query, collection_name } = input;
-
   let collectionExists: boolean | undefined;
   if (collection_name) {
     const collections = await listUserCollections(db);
     collectionExists = collections.includes(collection_name);
   }
-
   const result = validateQueryService(query, collectionExists, collection_name);
-
   if (result.valid) {
     try {
       const { EJSON } = await import('bson');
@@ -52,10 +43,8 @@ export async function executeValidateQuery(
       return result;
     }
   }
-
   return result;
 }
-
 export function formatValidateQueryResponse(result: ValidateQueryOutput): string {
   return JSON.stringify(result);
 }

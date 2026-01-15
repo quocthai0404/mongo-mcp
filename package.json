@@ -1,5 +1,5 @@
 {
-  "name": "mongo-mcp",
+  "name": "@quocthai0404/mongo-mcp",
   "version": "1.0.0",
   "description": "MongoDB MCP Server for AI coding assistants - provides database schema, field types, sample data, and query validation",
   "type": "module",

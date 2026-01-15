@@ -8,18 +8,15 @@ import {
   FieldInfo,
   CollectionSummary,
 } from '../types/schema.js';
-
 interface FieldStats {
   path: string;
   types: Map<string, number>;
   totalCount: number;
   values: Set<unknown>;
 }
-
 const ENUM_MAX_VALUES = 20;
 const ENUM_MIN_OCCURRENCES = 10;
 const ENUM_MAX_CARDINALITY_RATIO = 0.1;
-
 export function inferBsonType(value: unknown): BsonTypeName {
   if (value === null) return 'null';
   if (value === undefined) return 'undefined';
@@ -36,7 +33,6 @@ export function inferBsonType(value: unknown): BsonTypeName {
   if (typeof value === 'boolean') return 'Boolean';
   return 'undefined';
 }
-
 export async function getIndexInfo(collection: Collection): Promise<IndexInfo[]> {
   const indexes = await collection.indexes();
   return indexes.map((idx) => ({
@@ -46,7 +42,6 @@ export async function getIndexInfo(collection: Collection): Promise<IndexInfo[]>
     sparse: idx.sparse,
   }));
 }
-
 export async function getCollectionStats(
   db: Db,
   collectionName: string
@@ -63,7 +58,6 @@ export async function getCollectionStats(
     return { documentCount: count };
   }
 }
-
 export async function getCollectionInfo(
   db: Db,
   collectionName: string
@@ -73,7 +67,6 @@ export async function getCollectionInfo(
     getIndexInfo(collection),
     getCollectionStats(db, collectionName),
   ]);
-
   return {
     name: collectionName,
     documentCount: stats.documentCount,
@@ -81,7 +74,6 @@ export async function getCollectionInfo(
     avgDocumentSize: stats.avgDocumentSize,
   };
 }
-
 export async function getCollectionSummary(
   db: Db,
   collectionName: string
@@ -91,7 +83,6 @@ export async function getCollectionSummary(
     collection.indexes(),
     getCollectionStats(db, collectionName),
   ]);
-
   return {
     name: collectionName,
     documentCount: stats.documentCount,
@@ -99,7 +90,6 @@ export async function getCollectionSummary(
     avgDocSize: stats.avgDocumentSize,
   };
 }
-
 export async function listUserCollections(db: Db): Promise<string[]> {
   const collections = await db.listCollections().toArray();
   return collections
@@ -107,7 +97,6 @@ export async function listUserCollections(db: Db): Promise<string[]> {
     .filter((name) => !name.startsWith('system.'))
     .sort();
 }
-
 function traverseDocument(
   doc: Document,
   prefix: string,
@@ -116,7 +105,6 @@ function traverseDocument(
   for (const [key, value] of Object.entries(doc)) {
     const path = prefix ? `${prefix}.${key}` : key;
     const type = inferBsonType(value);
-
     let fieldStats = stats.get(path);
     if (!fieldStats) {
       fieldStats = {
@@ -127,39 +115,32 @@ function traverseDocument(
       };
       stats.set(path, fieldStats);
     }
-
     const typeCount = fieldStats.types.get(type) || 0;
     fieldStats.types.set(type, typeCount + 1);
     fieldStats.totalCount++;
-
     if (
       (type === 'String' || type === 'Number') &&
       fieldStats.values.size <= ENUM_MAX_VALUES
     ) {
       fieldStats.values.add(value);
     }
-
     if (type === 'Object' && value !== null) {
       traverseDocument(value as Document, path, stats);
     }
   }
 }
-
 function statsToFieldInfo(stats: FieldStats, sampleSize: number): FieldInfo {
   const types = Array.from(stats.types.keys()) as BsonTypeName[];
   const nonNullTypes = types.filter((t) => t !== 'null' && t !== 'undefined');
   const frequency = stats.totalCount / sampleSize;
-
   const fieldInfo: FieldInfo = {
     path: stats.path,
     types: types.sort(),
     frequency: Math.round(frequency * 100) / 100,
   };
-
   if (nonNullTypes.length > 1) {
     fieldInfo.isPolymorphic = true;
   }
-
   if (
     stats.values.size > 0 &&
     stats.values.size <= ENUM_MAX_VALUES &&
@@ -168,10 +149,8 @@ function statsToFieldInfo(stats: FieldStats, sampleSize: number): FieldInfo {
   ) {
     fieldInfo.enumValues = Array.from(stats.values);
   }
-
   return fieldInfo;
 }
-
 export async function inferSchema(
   db: Db,
   collectionName: string,
@@ -179,9 +158,7 @@ export async function inferSchema(
 ): Promise<Schema> {
   const collection = db.collection(collectionName);
   const stats = await getCollectionStats(db, collectionName);
-
   const actualSampleSize = Math.min(sampleSize, stats.documentCount);
-
   let samples: Document[];
   if (stats.documentCount <= sampleSize) {
     samples = await collection.find().toArray();
@@ -190,17 +167,14 @@ export async function inferSchema(
       .aggregate([{ $sample: { size: actualSampleSize } }])
       .toArray();
   }
-
   const fieldStats = new Map<string, FieldStats>();
   for (const doc of samples) {
     traverseDocument(doc, '', fieldStats);
   }
-
   const fields: Record<string, FieldInfo> = {};
   for (const stats of fieldStats.values()) {
     fields[stats.path] = statsToFieldInfo(stats, samples.length);
   }
-
   return {
     collection: collectionName,
     documentCount: stats.documentCount,

@@ -1,0 +1,29 @@
+# Source files (already compiled to dist/)
+src/
+tests/
+
+# Specs and docs
+specs/
+
+# Config files
+tsconfig.json
+vitest.config.ts
+.env
+.env.*
+
+# Development files
+*.log
+.git/
+.github/
+.vscode/
+.specify/
+node_modules/
+
+# Docker (not needed for npm)
+Dockerfile
+Dockerfile.smithery
+
+# Temp files
+*.tmp
+*.temp
+clean-comments.cjs

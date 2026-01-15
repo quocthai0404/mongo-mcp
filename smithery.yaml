@@ -1,0 +1,41 @@
+# Smithery configuration for mongo-mcp
+# https://smithery.ai
+
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    required:
+      - mongodbUri
+    properties:
+      mongodbUri:
+        type: string
+        description: MongoDB connection string (required)
+      mongodbTimeout:
+        type: number
+        description: "Connection timeout in milliseconds (default: 30000)"
+        default: 30000
+      schemaSampleSize:
+        type: number
+        description: "Number of documents to sample for schema inference (default: 1000)"
+        default: 1000
+      readOnly:
+        type: boolean
+        description: "Enable read-only mode (disable all write operations)"
+        default: false
+      disabledTools:
+        type: string
+        description: "Comma-separated list of tools to disable"
+        default: ""
+  commandFunction: |
+    (config) => ({
+      command: 'node',
+      args: ['dist/index.js'],
+      env: {
+        MONGODB_URI: config.mongodbUri,
+        MONGODB_TIMEOUT: String(config.mongodbTimeout ?? 30000),
+        SCHEMA_SAMPLE_SIZE: String(config.schemaSampleSize ?? 1000),
+        MONGODB_READONLY: String(config.readOnly ?? false),
+        MONGODB_DISABLED_TOOLS: config.disabledTools ?? ''
+      }
+    })

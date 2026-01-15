@@ -12,21 +12,18 @@ export type BsonTypeName =
   | 'Timestamp'
   | 'Object'
   | 'Array';
-
 export interface IndexInfo {
   name: string;
   keys: Record<string, 1 | -1>;
   unique?: boolean | undefined;
   sparse?: boolean | undefined;
 }
-
 export interface CollectionInfo {
   name: string;
   documentCount: number;
   indexes: IndexInfo[];
   avgDocumentSize?: number | undefined;
 }
-
 export interface FieldInfo {
   path: string;
   types: BsonTypeName[];
@@ -34,7 +31,6 @@ export interface FieldInfo {
   enumValues?: unknown[] | undefined;
   isPolymorphic?: boolean | undefined;
 }
-
 export interface Schema {
   collection: string;
   documentCount: number;
@@ -42,12 +38,10 @@ export interface Schema {
   fields: Record<string, FieldInfo>;
   generatedAt: string;
 }
-
 export interface SampleDocument {
   _id: string;
   [key: string]: unknown;
 }
-
 export interface SampleDataResult {
   collection: string;
   documentCount: number;
@@ -55,20 +49,17 @@ export interface SampleDataResult {
   documents: SampleDocument[];
   query?: object | undefined;
 }
-
 export interface QueryValidationResult {
   valid: boolean;
   error?: string | undefined;
   warnings?: string[] | undefined;
 }
-
 export interface CollectionSummary {
   name: string;
   documentCount: number;
   indexCount: number;
   avgDocSize?: number | undefined;
 }
-
 export interface SchemaOverview {
   database: string;
   collections: CollectionSummary[];

@@ -2,39 +2,38 @@
 
 [English](README_en.md) | **Tiếng Việt**
 
-MCP Server cấp production cho phép AI coding assistants truy cập MongoDB database schema, field types, sample data và query validation.
+MCP Server hoàn chỉnh cho phép AI coding assistants (GitHub Copilot, Claude, Gemini) truy cập và thao tác MongoDB database.
 
-## Tính năng
+## ✨ Tính năng nổi bật
 
-- **Schema Overview** - Metadata tổng quan về database
-- **List Collections** - Liệt kê tất cả collections
-- **Infer Schema** - Phân tích cấu trúc collection với field types
-- **Sample Data** - Lấy dữ liệu mẫu với PII masking
-- **Validate Query** - Kiểm tra cú pháp MongoDB query
+- **27 công cụ** - Đầy đủ CRUD, aggregation, index management
+- **PII Masking** - Tự động ẩn dữ liệu nhạy cảm
+- **Dynamic Database Selection** - Chọn database sau khi connect
+- **Security Config** - Read-only mode và disabled tools
 
-## Cài đặt
+## 📦 Cài đặt
+
+### NPM (Khuyên dùng)
+
+```bash
+npx mongo-mcp
+```
+
+### Từ source
 
 ```bash
 git clone https://github.com/quocthai0404/mongo-mcp.git
 cd mongo-mcp
-npm install
-npm run build
+npm install && npm run build
 ```
 
-## Cấu hình VS Code
+### Docker
 
-### Bước 1: Thêm MCP Server
+```bash
+docker run -e MONGODB_URI="your-uri" ghcr.io/quocthai0404/mongo-mcp
+```
 
-1. Mở **Command Palette** (`Ctrl+Shift+P`)
-2. Gõ và chọn: `MCP: Add Server`
-3. Chọn: **Command (stdio)**
-4. Nhập Server ID: `mongo-mcp`
-5. Nhập Command: `node`
-6. Chọn: **User Settings** (để dùng cho tất cả projects)
-
-### Bước 2: Cấu hình Server
-
-VS Code sẽ mở file `settings.json`. Tìm phần `mcp` và **sửa thành**:
+## ⚙️ Cấu hình VS Code
 
 ```json
 "mcp": {
@@ -42,15 +41,15 @@ VS Code sẽ mở file `settings.json`. Tìm phần `mcp` và **sửa thành**:
     {
       "type": "promptString",
       "id": "mongodb-uri",
-      "description": "Nhập MongoDB URI (mongodb://... hoặc mongodb+srv://...)",
+      "description": "MongoDB URI",
       "password": true
     }
   ],
   "servers": {
     "mongo-mcp": {
       "type": "stdio",
-      "command": "node",
-      "args": ["/đường/dẫn/tới/mongo-mcp/dist/index.js"],
+      "command": "npx",
+      "args": ["mongo-mcp"],
       "env": {
         "MONGODB_URI": "${input:mongodb-uri}"
       }
@@ -59,63 +58,95 @@ VS Code sẽ mở file `settings.json`. Tìm phần `mcp` và **sửa thành**:
 }
 ```
 
-> ⚠️ **Quan trọng**: Thay `/đường/dẫn/tới/mongo-mcp` bằng đường dẫn thực tế!
->
-> Ví dụ Windows: `"C:/Users/yourname/mongo-mcp/dist/index.js"`
+## 🛠️ Các công cụ (27 tools)
 
-### Bước 3: Khởi động Server
+### Core Database Operations
 
-1. Mở **Command Palette** (`Ctrl+Shift+P`)
-2. Chạy: `MCP: List Servers`
-3. Click **Start** trên `mongo-mcp`
-4. VS Code sẽ **hỏi nhập MongoDB URI** → Nhập connection string của bạn
-5. Hoàn tất! Server đang chạy 🎉
+| Công cụ            | Mô tả                                        |
+| ------------------ | -------------------------------------------- |
+| `list_databases`   | Liệt kê tất cả databases trong cluster       |
+| `use_database`     | Chọn database để làm việc                    |
+| `current_database` | Xem database hiện tại                        |
+| `list_collections` | Liệt kê collections                          |
+| `find`             | Query documents với filter, projection, sort |
+| `count`            | Đếm documents                                |
+| `distinct`         | Lấy giá trị unique của field                 |
 
-> 🔐 **Bảo mật**: MongoDB URI được mã hóa và lưu an toàn, không xuất hiện trong config!
+### Aggregation & Analysis
 
-### Gỡ cài đặt
+| Công cụ          | Mô tả                           |
+| ---------------- | ------------------------------- |
+| `aggregate`      | Chạy aggregation pipeline       |
+| `explain`        | Phân tích query execution plan  |
+| `db_stats`       | Thống kê database               |
+| `infer_schema`   | Phân tích schema của collection |
+| `sample_data`    | Lấy dữ liệu mẫu với PII masking |
+| `validate_query` | Validate MongoDB query          |
 
-1. Mở **Command Palette** (`Ctrl+Shift+P`)
-2. Chạy: `Preferences: Open User Settings (JSON)`
-3. Tìm phần `"mcp"` và xóa `"mongo-mcp"` trong `"servers"`
-4. Xóa input `"mongodb-uri"` trong `"inputs"` (nếu không dùng cho server khác)
-5. Lưu file
+### Write Operations
 
-## Các công cụ
+| Công cụ       | Mô tả                  | Safety     |
+| ------------- | ---------------------- | ---------- |
+| `insert_one`  | Insert 1 document      | ✅         |
+| `insert_many` | Insert nhiều documents | ✅         |
+| `update_one`  | Update 1 document      | ✅         |
+| `update_many` | Update nhiều documents | ✅         |
+| `delete_one`  | Xóa 1 document         | 🔒 confirm |
+| `delete_many` | Xóa nhiều documents    | 🔒 confirm |
 
-| Công cụ            | Mô tả                                   |
-| ------------------ | --------------------------------------- |
-| `list_collections` | Liệt kê tất cả collections              |
-| `infer_schema`     | Phân tích field types của collection    |
-| `sample_data`      | Lấy documents mẫu với dữ liệu đã masked |
-| `validate_query`   | Kiểm tra cú pháp MongoDB query          |
+### Index Management
 
-## Data Masking
+| Công cụ        | Mô tả           | Safety     |
+| -------------- | --------------- | ---------- |
+| `list_indexes` | Liệt kê indexes | ✅         |
+| `create_index` | Tạo index       | ✅         |
+| `drop_index`   | Xóa index       | 🔒 confirm |
+
+### Collection/Database Management
+
+| Công cụ                   | Mô tả              | Safety     |
+| ------------------------- | ------------------ | ---------- |
+| `create_collection`       | Tạo collection     | ✅         |
+| `rename_collection`       | Đổi tên collection | ✅         |
+| `collection_storage_size` | Xem storage stats  | ✅         |
+| `drop_collection`         | Xóa collection     | 🔒 confirm |
+| `drop_database`           | Xóa database       | 🔒 confirm |
+
+> 🔒 **confirm**: Tools yêu cầu `confirm: true` để thực thi
+
+## 🔐 Bảo mật
+
+### Read-Only Mode
+
+```bash
+MONGODB_READONLY=true  # Block tất cả write operations
+```
+
+### Disabled Tools
+
+```bash
+MONGODB_DISABLED_TOOLS=drop_database,drop_collection
+```
+
+### PII Masking
 
 | Loại        | Patterns                | Mask              |
 | ----------- | ----------------------- | ----------------- |
 | Credentials | password, secret, token | `[MASKED_SECRET]` |
 | Email       | email                   | `[MASKED_EMAIL]`  |
 | Phone       | phone, mobile           | `[MASKED_PHONE]`  |
-| Tài chính   | credit_card, cvv        | `[MASKED_CARD]`   |
+| Financial   | credit_card, cvv        | `[MASKED_CARD]`   |
 
-## Bảo mật
+## 📝 Variables
 
-- **Chỉ đọc**: Không có thao tác ghi
-- **PII masking**: Dữ liệu nhạy cảm tự động được ẩn
-- **Mã hóa credentials**: MongoDB URI được VS Code lưu trữ an toàn
+| Variable                 | Default    | Description                      |
+| ------------------------ | ---------- | -------------------------------- |
+| `MONGODB_URI`            | _required_ | Connection string                |
+| `MONGODB_TIMEOUT`        | 30000      | Connection timeout (ms)          |
+| `SCHEMA_SAMPLE_SIZE`     | 1000       | Documents to sample              |
+| `MONGODB_READONLY`       | false      | Read-only mode                   |
+| `MONGODB_DISABLED_TOOLS` | ""         | Comma-separated tools to disable |
 
-## Phát triển
+## 📄 Giấy phép
 
-```bash
-npm test
-npm run build
-```
-
-## Giấy phép
-
-MIT
-
-## Tác giả
-
-Thai Phan ([@quocthai0404](https://github.com/quocthai0404))
+MIT - Thai Phan ([@quocthai0404](https://github.com/quocthai0404))
