@@ -11,15 +11,13 @@ MCP Server hoàn chỉnh cho phép AI coding assistants (GitHub Copilot, Claude,
 - **Dynamic Database Selection** - Chọn database sau khi connect
 - **Security Config** - Read-only mode và disabled tools
 
-## 📦 Cài đặt
+## 📦 Cài đặt (Chọn 1 trong 3 cách)
 
-### NPM (Khuyên dùng)
+### Cách 1: NPX (Khuyên dùng - Không cần cài đặt)
 
-```bash
-npx mongo-mcp
-```
+Chỉ cần cấu hình VS Code bên dưới, `npx` sẽ tự động tải và chạy package.
 
-### Từ source
+### Cách 2: Từ source
 
 ```bash
 git clone https://github.com/quocthai0404/mongo-mcp.git
@@ -27,13 +25,21 @@ cd mongo-mcp
 npm install && npm run build
 ```
 
-### Docker
+### Cách 3: Docker
+
+> ⚠️ **Lưu ý**: MCP Server sử dụng stdio transport, chỉ hoạt động khi được gọi từ MCP client (VS Code). Không thể chạy standalone bằng `docker run` trực tiếp.
 
 ```bash
-docker run -e MONGODB_URI="your-uri" ghcr.io/quocthai0404/mongo-mcp
+docker pull ghcr.io/quocthai0404/mongo-mcp
 ```
 
+---
+
 ## ⚙️ Cấu hình VS Code
+
+Thêm vào `settings.json` của VS Code:
+
+### Dùng NPX (Cách 1 - Khuyên dùng)
 
 ```json
 "mcp": {
@@ -49,7 +55,38 @@ docker run -e MONGODB_URI="your-uri" ghcr.io/quocthai0404/mongo-mcp
     "mongo-mcp": {
       "type": "stdio",
       "command": "npx",
-      "args": ["mongo-mcp"],
+      "args": [
+        "@quocthai0404/mongo-mcp"
+      ],
+      "env": {
+        "MONGODB_URI": "${input:mongodb-uri}"
+      }
+    }
+  }
+}
+```
+
+### Dùng Docker (Cách 3)
+
+```json
+"mcp": {
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "mongodb-uri",
+      "description": "MongoDB URI",
+      "password": true
+    }
+  ],
+  "servers": {
+    "mongo-mcp": {
+      "type": "stdio",
+      "command": "docker",
+      "args": [
+        "run", "-i", "--rm",
+        "--env", "MONGODB_URI",
+        "ghcr.io/quocthai0404/mongo-mcp"
+      ],
       "env": {
         "MONGODB_URI": "${input:mongodb-uri}"
       }

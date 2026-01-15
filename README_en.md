@@ -12,29 +12,35 @@ A production-grade Model Context Protocol (MCP) Server that exposes MongoDB data
 - **Sample Data** - Retrieve example documents with PII masking
 - **Validate Query** - Check MongoDB query syntax
 
-## Installation
+## Installation (Choose ONE)
+
+### Option 1: NPX (Recommended - No installation needed)
+
+Just configure VS Code below, `npx` will automatically download and run the package.
+
+### Option 2: From source
 
 ```bash
 git clone https://github.com/quocthai0404/mongo-mcp.git
 cd mongo-mcp
-npm install
-npm run build
+npm install && npm run build
 ```
+
+### Option 3: Docker
+
+> ⚠️ **Note**: MCP Server uses stdio transport, it only works when called from an MCP client (VS Code). Cannot run standalone with `docker run` directly.
+
+```bash
+docker pull ghcr.io/quocthai0404/mongo-mcp
+```
+
+---
 
 ## VS Code Setup
 
-### Step 1: Add MCP Server
+Add the following to your VS Code `settings.json`:
 
-1. Open **Command Palette** (`Ctrl+Shift+P`)
-2. Type and select: `MCP: Add Server`
-3. Select: **Command (stdio)**
-4. Enter Server ID: `mongo-mcp`
-5. Enter Command: `node`
-6. Select: **User Settings** (to use across all projects)
-
-### Step 2: Configure Server
-
-VS Code will open `settings.json`. Find the `mcp` section and **modify it to**:
+### Using NPX (Option 1 - Recommended)
 
 ```json
 "mcp": {
@@ -42,15 +48,17 @@ VS Code will open `settings.json`. Find the `mcp` section and **modify it to**:
     {
       "type": "promptString",
       "id": "mongodb-uri",
-      "description": "Enter MongoDB URI (mongodb://... or mongodb+srv://...)",
+      "description": "MongoDB URI",
       "password": true
     }
   ],
   "servers": {
     "mongo-mcp": {
       "type": "stdio",
-      "command": "node",
-      "args": ["/absolute/path/to/mongo-mcp/dist/index.js"],
+      "command": "npx",
+      "args": [
+        "@quocthai0404/mongo-mcp"
+      ],
       "env": {
         "MONGODB_URI": "${input:mongodb-uri}"
       }
@@ -59,11 +67,36 @@ VS Code will open `settings.json`. Find the `mcp` section and **modify it to**:
 }
 ```
 
-> ⚠️ **Important**: Replace `/absolute/path/to/mongo-mcp` with your actual path!
->
-> Windows example: `"C:/Users/yourname/mongo-mcp/dist/index.js"`
+### Using Docker (Option 3)
 
-### Step 3: Start Server
+```json
+"mcp": {
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "mongodb-uri",
+      "description": "MongoDB URI",
+      "password": true
+    }
+  ],
+  "servers": {
+    "mongo-mcp": {
+      "type": "stdio",
+      "command": "docker",
+      "args": [
+        "run", "-i", "--rm",
+        "--env", "MONGODB_URI",
+        "ghcr.io/quocthai0404/mongo-mcp"
+      ],
+      "env": {
+        "MONGODB_URI": "${input:mongodb-uri}"
+      }
+    }
+  }
+}
+```
+
+### Start Server
 
 1. Open **Command Palette** (`Ctrl+Shift+P`)
 2. Run: `MCP: List Servers`
@@ -71,7 +104,7 @@ VS Code will open `settings.json`. Find the `mcp` section and **modify it to**:
 4. VS Code will **prompt for MongoDB URI** → Enter your connection string
 5. Done! Server is running 🎉
 
-> 🔐 **Security**: MongoDB URI is encrypted and stored securely, never exposed in config!
+> 🔐 **Security**: MongoDB URI is encrypted and stored securely by VS Code!
 
 ### Uninstall
 
