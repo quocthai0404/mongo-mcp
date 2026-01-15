@@ -1,6 +1,9 @@
 # Smithery configuration for mongo-mcp
 # https://smithery.ai
 
+# Use container runtime - Smithery will build from Dockerfile
+runtime: "container"
+
 startCommand:
   type: stdio
   configSchema:
