@@ -52,9 +52,11 @@ export class ConnectionManager {
         const options: MongoClientOptions = {
           serverSelectionTimeoutMS: config.mongodbTimeout,
           connectTimeoutMS: config.mongodbTimeout,
-          socketTimeoutMS: config.mongodbTimeout,
-          maxPoolSize: 10,
-          minPoolSize: 1,
+          socketTimeoutMS: config.mongodbSocketTimeoutMs,
+          maxPoolSize: config.mongodbMaxPoolSize,
+          minPoolSize: config.mongodbMinPoolSize,
+          maxIdleTimeMS: config.mongodbMaxIdleTimeMs,
+          waitQueueTimeoutMS: config.mongodbWaitQueueTimeoutMs,
         };
         this.client = new MongoClient(config.mongodbUri, options);
         await this.client.connect();

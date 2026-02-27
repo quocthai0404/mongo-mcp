@@ -180,6 +180,11 @@ MONGODB_DISABLED_TOOLS=drop_database,drop_collection
 | ------------------------ | ---------- | -------------------------------- |
 | `MONGODB_URI`            | _required_ | Connection string                |
 | `MONGODB_TIMEOUT`        | 30000      | Connection timeout (ms)          |
+| `MONGODB_SOCKET_TIMEOUT_MS` | 0       | Socket timeout (ms), `0` = unlimited |
+| `MONGODB_MAX_POOL_SIZE`  | 4          | Maximum connections per MCP process |
+| `MONGODB_MIN_POOL_SIZE`  | 0          | Minimum idle connections kept alive |
+| `MONGODB_MAX_IDLE_TIME_MS` | 30000    | Close idle connections after N ms |
+| `MONGODB_WAIT_QUEUE_TIMEOUT_MS` | 5000 | Max wait for a pool connection (ms) |
 | `SCHEMA_SAMPLE_SIZE`     | 1000       | Documents to sample              |
 | `MONGODB_READONLY`       | false      | Read-only mode                   |
 | `MONGODB_DISABLED_TOOLS` | ""         | Comma-separated tools to disable |
